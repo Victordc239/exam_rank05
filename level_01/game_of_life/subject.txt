@@ -1,0 +1,42 @@
+Submitted files: *.c, *.h
+Allowed functions: atoi, read, putchar, malloc, calloc, realloc, free
+
+Prototipo de programa: ./life ancho alto iteraciones
+Ancho y alto son las dimensiones del tablero e iteraciones es el número de rondas del juego de la vida.
+La configuración inicial del tablero se dibujará mediante una secuencia de comandos en la entrada estándar.
+Imagina un lápiz que comienza en la esquina superior izquierda del tablero.
+Cada comando es uno de estos caracteres:
+	w a s d -> mueve el lápiz hacia arriba, izquierda, abajo y derecha.
+	x -> levanta o baja el lápiz para comenzar o detener el dibujo.
+El lápiz no se mueve fuera del tablero y permanece quieto si un comando lo requiere.
+El lápiz no hace nada en caso de un comando inválido.
+Una vez que se alcanza el final del archivo, tu programa debe simular un juego de la vida en el tablero e imprimir el resultado en la salida estándar (cada celda viva se representará con el carácter '0' y cada celda muerta con un espacio).
+Cada celda fuera del tablero se considerará muerta.
+
+Ejemplos:
+
+$> echo 'sdxddssaaww' | ./a.out 5 5 0 | cat -e
+     $
+ 000 $
+ 0 0 $
+ 000 $
+     $
+$> echo 'sdxssdswdxdddxsaddawxwdxwaa' | ./a.out 10 6 0 | cat -e
+          $
+ 0   000  $
+ 0     0  $
+ 000  0   $
+  0  000  $
+          $
+$> echo 'dxss' | ./a.out 3 3 0 | cat -e
+ 0 $
+ 0 $
+ 0 $
+$> echo 'dxss' | ./a.out 3 3 1 | cat -e
+   $
+000$
+   $
+$> echo 'dxss' | ./a.out 3 3 2 | cat -e
+ 0 $
+ 0 $
+ 0 $
