@@ -6,7 +6,7 @@
 /*   By: victor <victor@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/21 16:42:46 by vdiez-cu          #+#    #+#             */
-/*   Updated: 2026/05/21 20:07:37 by victor           ###   ########.fr       */
+/*   Updated: 2026/05/21 20:11:52 by victor           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,55 +98,63 @@ int element_control(char** map, char c1, char c2)
 
 int loadMap(FILE* file, t_map* map, t_elements* elements)
 {
+	int i;
+	int read;
+	char* line = NULL;
+	size_t len = 0;
+
 	map->height = elements->n_lines;
 	map->grid = (char**)malloc((map->height + 1) * (sizeof(char *)));
 	map->grid[map->height] = NULL;
 
-	char* line = NULL;
-	size_t len = 0;
-
-	if(getline(&line, &len, file) == -1)
+	if (getline(&line, &len, file) == -1)
 	{
 		free_map(map->grid);
-		return(-1);
+		return (-1);
 	}
-
-	for(int i = 0; i < map->height; i++)
+	i = 0;
+	while (i < map->height)
 	{
-		int read = getline(&line, &len, file);
-		if(read == -1) {
-			free(line);
-			free_map(map->grid);
-			return(-1);
-		}
-		if(line[read - 1] == '\n')
-			read--;
-		else{
-			free(line);
-			free_map(map->grid);
-			return(-1);
-		}
-		map->grid[i] = ft_substr(line, 0, read);
-		if(!(map->grid[i]))
+		read = getline(&line, &len, file);
+		if (read == -1)
 		{
 			free(line);
 			free_map(map->grid);
-			return(-1);
+			return (-1);
 		}
-		if(i == 0)
+		if (line[read - 1] == '\n')
+			read--;
+		else
+		{
+			free(line);
+			free_map(map->grid);
+			return (-1);
+		}
+		map->grid[i] = ft_substr(line, 0, read);
+		if (!(map->grid[i]))
+		{
+			free(line);
+			free_map(map->grid);
+			return (-1);
+		}
+		if (i == 0)
 			map->width = read;
-		else{
-			if(map->width != read){
+		else
+		{
+			if (map->width != read)
+			{
 				free(line);
 				free_map(map->grid);
-				return(-1);
+				return (-1);
 			}
 		}
+		i++;
 	}
-	if(element_control(map->grid, elements->empty, elements->obstacle) == -1) {
+	if (element_control(map->grid, elements->empty, elements->obstacle) == -1)
+	{
 		free(line);
 		free_map(map->grid);
-		return(-1);
+		return (-1);
 	}
 	free(line);
 	return (0);
@@ -166,49 +174,72 @@ int find_min(int n1, int n2, int n3)
 void find_big_square(t_map* map, t_square* square, t_elements* elements)
 {
 	int matrix[map->height][map->width];
-	for(int i = 0; i < map->height; i++)
+	int i;
+	int j;
+
+	i = 0;
+	while (i < map->height)
 	{
-		for(int j = 0; j < map->width; j++)
+		j = 0;
+		while (j < map->width)
+		{
 			matrix[i][j] = 0;
+			j++;
+		}
+		i++;
 	}
 
-	for(int i = 0; i < map->height; i++)
+	i = 0;
+	while (i < map->height)
 	{
-		for(int j = 0; j < map->width; j++)
+		j = 0;
+		while (j < map->width)
 		{
-			if(map->grid[i][j] == elements->obstacle)
+			if (map->grid[i][j] == elements->obstacle)
 				matrix[i][j] = 0;
-			else if(i == 0 || j == 0)
+			else if (i == 0 || j == 0)
 				matrix[i][j] = 1;
 			else
 			{
-				int min = find_min(matrix[i - 1][j],matrix[i - 1][j - 1], matrix[i][j - 1]);
+				int min = find_min(matrix[i - 1][j], matrix[i - 1][j - 1], matrix[i][j - 1]);
 				matrix[i][j] = min + 1;
 			}
 
-			if(matrix[i][j] > square->size)
+			if (matrix[i][j] > square->size)
 			{
 				square->size = matrix[i][j];
 				square->i = i - matrix[i][j] + 1;
 				square->j = j - matrix[i][j] + 1;
 			}
+			j++;
 		}
+		i++;
 	}
 }
 
 void print_filled_square(t_map* map, t_square* square, t_elements* elements)
 {
-	for(int i = square->i; i < square->i + square->size; i++)
-	{
-		for(int j = square->j; j < square->j + square->size; j++)
-		{
-			if((i < map->height) && (j < map->width))
-				map->grid[i][j] = elements->full;
-		}
-	}
+	int i;
+	int j;
 
-	for(int i = 0; i < map->height; i++)
+	i = square->i;
+	while (i < square->i + square->size)
+	{
+		j = square->j;
+		while (j < square->j + square->size)
+		{
+			if ((i < map->height) && (j < map->width))
+				map->grid[i][j] = elements->full;
+			j++;
+		}
+		i++;
+	}
+	i = 0;
+	while (i < map->height)
+	{
 		fprintf(stdout, "%s\n", map->grid[i]);
+		i++;
+	}
 }
 
 int execute_bsq(FILE* file)
